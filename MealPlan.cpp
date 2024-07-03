@@ -9,6 +9,7 @@
 #include <termios.h>
 #include <vector>
 #include <string>
+#include <map>
 
 const char *menuFileName = "/mnt/omv1share1/Workspace/MealPlan/menu.txt";
 const char *recentSelectionsFileName = "/mnt/omv1share1/Workspace/MealPlan/recentSelections.txt";
@@ -27,7 +28,7 @@ bool isInVector(std::vector<int> *pV, int target)
     }
     return false;
 }
-int main(int argc, char *argv[])
+int main1(void)
 {
     int selection;
     FILE *fpMenu;
@@ -39,7 +40,8 @@ int main(int argc, char *argv[])
     std::vector<int>::const_iterator itRecentSelections;
     bool exitFlag = false;
     bool acceptFlag = false;
-    char acceptYN;
+    bool abortFlag = false;
+    char acceptYNQ;
     size_t maxNumRecentSelections = DEFAULT_MAX_NUM_RECENT_SELECTIONS;
     struct termios oldSettings;
     struct termios newSettings;
@@ -48,7 +50,7 @@ int main(int argc, char *argv[])
     if ((FILE *)(NULL) == fpMenu)
     {
         fprintf(stderr, "Can't open menu file.\n");
-        exit(1);
+        return 1;
     }
     while (fgets(tempLine, sizeof(tempLine), fpMenu))
     {
@@ -79,7 +81,9 @@ int main(int argc, char *argv[])
 
     srand(time(NULL));
 
-    while (false == acceptFlag)
+    while   (   (false == acceptFlag)
+             && (false == abortFlag)
+            )
     {
         exitFlag = false;
         while (false == exitFlag)
@@ -87,15 +91,22 @@ int main(int argc, char *argv[])
             selection = rand() % theMenu.size();
             if (false == isInVector(&recentSelections, selection))
             {
-                std::cout << '\n' << selection << ' ' << theMenu[selection] << '\n';
+                std::cout << '\n' << selection << ": " << theMenu[selection] << '\n';
                 exitFlag = true;
             }
         }
-        printf("Accept? <Y/N>: ");
-        acceptYN = (char)getchar();
-        if  (   ('Y' == acceptYN)
-             || ('y' == acceptYN)
+        printf("Accept? <Y/N/Q>: ");
+        acceptYNQ = (char)getchar();
+
+        if  (   ('Q' == acceptYNQ)
+             || ('q' == acceptYNQ)
             )
+        {
+            abortFlag = true;
+        }
+        else if (   ('Y' == acceptYNQ)
+                 || ('y' == acceptYNQ)
+                )
         {
             acceptFlag = true;
         }
@@ -104,11 +115,16 @@ int main(int argc, char *argv[])
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldSettings);
 
+    if (abortFlag)
+    {
+        return 0;
+    }
+
     fpRecentSelections = fopen(recentSelectionsFileName, "w");
     if ((FILE *)(NULL) == fpRecentSelections)
     {
         fprintf(stderr, "Can't open recent selections file.\n");
-        exit(2);
+        return 2;
     }
     itRecentSelections = recentSelections.begin();
     if  (   (itRecentSelections != recentSelections.end())
@@ -126,4 +142,14 @@ int main(int argc, char *argv[])
     fclose(fpRecentSelections);
 
     return 0;
+}
+
+int main2(void)
+{
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    return (main1());
 }
