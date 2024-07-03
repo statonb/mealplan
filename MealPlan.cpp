@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <set>
 
 const char *menuFileName = "/mnt/omv1share1/Workspace/MealPlan/menu.txt";
 const char *recentSelectionsFileName = "/mnt/omv1share1/Workspace/MealPlan/recentSelections.txt";
@@ -36,8 +37,8 @@ int main1(void)
     char *cp;
     char tempLine[256];
     std::vector<std::string> theMenu;
-    std::vector<int> recentSelections;
-    std::vector<int>::const_iterator itRecentSelections;
+    std::vector<int> recentSelectionsVector;
+    std::vector<int>::const_iterator itRecentSelectionsVector;
     bool exitFlag = false;
     bool acceptFlag = false;
     bool abortFlag = false;
@@ -69,7 +70,7 @@ int main1(void)
         while(fgets(tempLine, sizeof(tempLine), fpRecentSelections))
         {
             selection = (int)strtol(tempLine, NULL, 10);
-            recentSelections.push_back(selection);
+            recentSelectionsVector.push_back(selection);
         }
         fclose(fpRecentSelections);
     }
@@ -89,7 +90,7 @@ int main1(void)
         while (false == exitFlag)
         {
             selection = rand() % theMenu.size();
-            if (false == isInVector(&recentSelections, selection))
+            if (false == isInVector(&recentSelectionsVector, selection))
             {
                 std::cout << '\n' << selection << ": " << theMenu[selection] << '\n';
                 exitFlag = true;
@@ -126,17 +127,17 @@ int main1(void)
         fprintf(stderr, "Can't open recent selections file.\n");
         return 2;
     }
-    itRecentSelections = recentSelections.begin();
-    if  (   (itRecentSelections != recentSelections.end())
-         && (recentSelections.size() >= maxNumRecentSelections)
+    itRecentSelectionsVector = recentSelectionsVector.begin();
+    if  (   (itRecentSelectionsVector != recentSelectionsVector.end())
+         && (recentSelectionsVector.size() >= maxNumRecentSelections)
         )
     {
-        itRecentSelections++;
+        itRecentSelectionsVector++;
     }
-    while (itRecentSelections != recentSelections.end())
+    while (itRecentSelectionsVector != recentSelectionsVector.end())
     {
-        fprintf(fpRecentSelections, "%d\n", *itRecentSelections);
-        itRecentSelections++;
+        fprintf(fpRecentSelections, "%d\n", *itRecentSelectionsVector);
+        itRecentSelectionsVector++;
     }
     fprintf(fpRecentSelections, "%d\n", selection);
     fclose(fpRecentSelections);
