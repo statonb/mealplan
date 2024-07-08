@@ -69,6 +69,13 @@ int main1(void)
     {
         while(fgets(tempLine, sizeof(tempLine), fpRecentSelections))
         {
+            // First thing on the line is a selection number.  The rest of the line can be anything
+            // as long as there is a space after the selection number.
+            cp = strchr(tempLine, ' ');
+            if ((char *)(NULL) != cp)
+            {
+                *cp = '\0';
+            }
             selection = (int)strtol(tempLine, NULL, 10);
             recentSelectionsVector.push_back(selection);
         }
@@ -136,10 +143,10 @@ int main1(void)
     }
     while (itRecentSelectionsVector != recentSelectionsVector.end())
     {
-        fprintf(fpRecentSelections, "%d\n", *itRecentSelectionsVector);
+        fprintf(fpRecentSelections, "%d %s\n", *itRecentSelectionsVector, theMenu[*itRecentSelectionsVector].c_str());
         itRecentSelectionsVector++;
     }
-    fprintf(fpRecentSelections, "%d\n", selection);
+    fprintf(fpRecentSelections, "%d %s\n", selection, theMenu[selection].c_str());
     fclose(fpRecentSelections);
 
     return 0;
