@@ -134,19 +134,20 @@ int main1(void)
         fprintf(stderr, "Can't open recent selections file.\n");
         return 2;
     }
+    // Write current selection first
+    fprintf(fpRecentSelections, "%d %s\n", selection, theMenu[selection].c_str());
+
+    // Write recent selections up to the max number of saved selections
     itRecentSelectionsVector = recentSelectionsVector.begin();
-    if  (   (itRecentSelectionsVector != recentSelectionsVector.end())
-         && (recentSelectionsVector.size() >= maxNumRecentSelections)
-        )
-    {
-        itRecentSelectionsVector++;
-    }
-    while (itRecentSelectionsVector != recentSelectionsVector.end())
+    size_t n = 1;
+    while   (   (itRecentSelectionsVector != recentSelectionsVector.end())
+             && (n < maxNumRecentSelections)
+            )
     {
         fprintf(fpRecentSelections, "%d %s\n", *itRecentSelectionsVector, theMenu[*itRecentSelectionsVector].c_str());
         itRecentSelectionsVector++;
+        n++;
     }
-    fprintf(fpRecentSelections, "%d %s\n", selection, theMenu[selection].c_str());
     fclose(fpRecentSelections);
 
     return 0;
