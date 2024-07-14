@@ -16,7 +16,7 @@ const char *menuFileName = "/mnt/omv1share1/Workspace/MealPlan/menu.txt";
 const char *recentSelectionsFileName = "/mnt/omv1share1/Workspace/MealPlan/recentSelections.txt";
 const size_t DEFAULT_MAX_NUM_RECENT_SELECTIONS = 14;
 
-bool isInVector(std::vector<int> *pV, int target)
+bool isInVector(std::vector<int> *pV, const int target)
 {
     std::vector<int>::const_iterator itV = pV->begin();
     while (itV != pV->end())
@@ -60,7 +60,21 @@ int main1(void)
         {
             *cp = '\0';
         }
-        theMenu.push_back(tempLine);
+        // If there's a colon on the line then the line must start with an index number as follows:
+        // 5: The Fifth Menu Item
+        // Skip over this index number and the space that follows the colon.
+        cp = strchr(tempLine, ':');
+        if ((char *)(NULL) != cp)
+        {
+            // Found the colon.  Advance past the colon and the space
+            cp += 2;
+        }
+        else
+        {
+            // No colon found.
+            cp = tempLine;
+        }
+        theMenu.push_back(cp);
     }
     fclose(fpMenu);
 
@@ -70,11 +84,19 @@ int main1(void)
         while(fgets(tempLine, sizeof(tempLine), fpRecentSelections))
         {
             // First thing on the line is a selection number.  The rest of the line can be anything
-            // as long as there is a space after the selection number.
-            cp = strchr(tempLine, ' ');
+            // as long as there is a colon or a space immediately after the selection number.
+            cp = strchr(tempLine, ':');
             if ((char *)(NULL) != cp)
             {
                 *cp = '\0';
+            }
+            else
+            {
+                cp = strchr(tempLine, ' ');
+                if ((char *)(NULL) != cp)
+                {
+                    *cp = '\0';
+                }
             }
             selection = (int)strtol(tempLine, NULL, 10);
             recentSelectionsVector.push_back(selection);
@@ -135,7 +157,7 @@ int main1(void)
         return 2;
     }
     // Write current selection first
-    fprintf(fpRecentSelections, "%d %s\n", selection, theMenu[selection].c_str());
+    fprintf(fpRecentSelections, "%d: %s\n", selection, theMenu[selection].c_str());
 
     // Write recent selections up to the max number of saved selections
     itRecentSelectionsVector = recentSelectionsVector.begin();
@@ -144,7 +166,7 @@ int main1(void)
              && (n < maxNumRecentSelections)
             )
     {
-        fprintf(fpRecentSelections, "%d %s\n", *itRecentSelectionsVector, theMenu[*itRecentSelectionsVector].c_str());
+        fprintf(fpRecentSelections, "%d: %s\n", *itRecentSelectionsVector, theMenu[*itRecentSelectionsVector].c_str());
         itRecentSelectionsVector++;
         n++;
     }
