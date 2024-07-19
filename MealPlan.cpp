@@ -38,12 +38,14 @@ int main1(void)
     char tempLine[256];
     std::vector<std::string> theMenu;
     std::vector<int> recentSelectionsVector;
+    std::vector<int> rejectedItemsVector;
     std::vector<int>::const_iterator itRecentSelectionsVector;
     bool exitFlag = false;
     bool acceptFlag = false;
     bool abortFlag = false;
     char acceptYNQ;
     size_t maxNumRecentSelections = DEFAULT_MAX_NUM_RECENT_SELECTIONS;
+    size_t itemsRemaining;
     struct termios oldSettings;
     struct termios newSettings;
 
@@ -104,6 +106,8 @@ int main1(void)
         fclose(fpRecentSelections);
     }
 
+    itemsRemaining = theMenu.size() - recentSelectionsVector.size();
+
     tcgetattr(STDIN_FILENO, &oldSettings);
     newSettings = oldSettings;
     newSettings.c_lflag &= (~ICANON);
@@ -119,7 +123,9 @@ int main1(void)
         while (false == exitFlag)
         {
             selection = rand() % theMenu.size();
-            if (false == isInVector(&recentSelectionsVector, selection))
+            if  (   (false == isInVector(&recentSelectionsVector, selection))
+                 && (false == isInVector(&rejectedItemsVector, selection))
+                )
             {
                 std::cout << '\n' << selection << ": " << theMenu[selection] << '\n';
                 exitFlag = true;
@@ -127,6 +133,7 @@ int main1(void)
         }
         printf("Accept? <Y/N/Q>: ");
         acceptYNQ = (char)getchar();
+        putchar('\n');
 
         if  (   ('Q' == acceptYNQ)
              || ('q' == acceptYNQ)
@@ -140,7 +147,19 @@ int main1(void)
         {
             acceptFlag = true;
         }
-        putchar('\n');
+        else
+        {
+            --itemsRemaining;
+            printf("\n%ld menu items remaining\n", itemsRemaining);
+            if (itemsRemaining > 0)
+            {
+                rejectedItemsVector.push_back(selection);
+            }
+            else
+            {
+                abortFlag = true;
+            }
+        }
     }
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldSettings);
