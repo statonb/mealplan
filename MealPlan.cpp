@@ -43,6 +43,7 @@ int main1(void)
     bool exitFlag = false;
     bool acceptFlag = false;
     bool abortFlag = false;
+    bool nullMenuItem;
     char acceptYNQ;
     size_t maxNumRecentSelections = DEFAULT_MAX_NUM_RECENT_SELECTIONS;
     size_t itemsRemaining;
@@ -127,13 +128,27 @@ int main1(void)
                  && (false == isInVector(&rejectedItemsVector, selection))
                 )
             {
-                std::cout << '\n' << selection << ": " << theMenu[selection] << '\n';
+                // See if the selection contains the string "null".
+                nullMenuItem = ((char *)(NULL) != strstr(theMenu[selection].c_str(), "null")) ? true : false;
+                if (false == nullMenuItem)
+                {
+                    std::cout << '\n' << selection << ": " << theMenu[selection] << '\n';
+                }
                 exitFlag = true;
             }
         }
-        printf("Accept? <Y/N/Q>: ");
-        acceptYNQ = (char)getchar();
-        putchar('\n');
+
+        if (true == nullMenuItem)
+        {
+            // The selection contains the string "null" so skip it
+            acceptYNQ = 'n';
+        }
+        else
+        {
+            printf("Accept? <Y/N/Q>: ");
+            acceptYNQ = (char)getchar();
+            putchar('\n');
+        }
 
         if  (   ('Q' == acceptYNQ)
              || ('q' == acceptYNQ)
@@ -150,7 +165,6 @@ int main1(void)
         else
         {
             --itemsRemaining;
-            printf("\n%ld menu items remaining\n", itemsRemaining);
             if (itemsRemaining > 0)
             {
                 rejectedItemsVector.push_back(selection);
@@ -158,6 +172,12 @@ int main1(void)
             else
             {
                 abortFlag = true;
+            }
+            if  (   (false == nullMenuItem)
+                 || (0 == itemsRemaining)
+                )
+            {
+                printf("\n%ld menu items remaining\n", itemsRemaining);
             }
         }
     }
