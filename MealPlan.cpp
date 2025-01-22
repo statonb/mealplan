@@ -11,10 +11,11 @@
 #include <string>
 #include <map>
 #include <set>
+#include "crc32.h"
 
 const char *menuFileName = "/mnt/omv1share1/Workspace/MealPlan/menu.txt";
 const char *recentSelectionsFileName = "/mnt/omv1share1/Workspace/MealPlan/recentSelections.txt";
-const size_t DEFAULT_MAX_NUM_RECENT_SELECTIONS = 14;
+const size_t DEFAULT_MAX_NUM_RECENT_SELECTIONS = 10;
 
 bool isInVector(std::vector<int> *pV, const int target)
 {
@@ -29,6 +30,24 @@ bool isInVector(std::vector<int> *pV, const int target)
     }
     return false;
 }
+
+void randInit(bool verboseFlag = false)
+{
+    uint32_t t;
+    uint32_t pid;
+    uint32_t randSeed = 0;
+
+    t = (uint32_t)time(NULL);
+    pid = (uint32_t)getpid();
+    randSeed = crc32(randSeed, &t, sizeof(t));
+    randSeed = crc32(randSeed, &pid, sizeof(pid));
+    if (verboseFlag)
+    {
+        printf("t = %08X  pid = %08X  srand(%08X)\n", t, pid, randSeed);
+    }
+    srand(randSeed);
+}
+
 int main1(void)
 {
     int selection;
@@ -114,7 +133,7 @@ int main1(void)
     newSettings.c_lflag &= (~ICANON);
     tcsetattr(STDIN_FILENO, TCSANOW, &newSettings);
 
-    srand(time(NULL));
+    randInit();
 
     while   (   (false == acceptFlag)
              && (false == abortFlag)

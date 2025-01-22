@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = bin/Release/MealPlan
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/MealPlan.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/MealPlan.o $(OBJDIR_DEBUG)/crc32.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/MealPlan.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/MealPlan.o $(OBJDIR_RELEASE)/crc32.o
 
 all: debug release
 
@@ -62,6 +62,9 @@ out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 $(OBJDIR_DEBUG)/MealPlan.o: MealPlan.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c MealPlan.cpp -o $(OBJDIR_DEBUG)/MealPlan.o
 
+$(OBJDIR_DEBUG)/crc32.o: crc32.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c crc32.cpp -o $(OBJDIR_DEBUG)/crc32.o
+
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf bin/Debug
@@ -80,6 +83,9 @@ out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 
 $(OBJDIR_RELEASE)/MealPlan.o: MealPlan.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c MealPlan.cpp -o $(OBJDIR_RELEASE)/MealPlan.o
+
+$(OBJDIR_RELEASE)/crc32.o: crc32.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c crc32.cpp -o $(OBJDIR_RELEASE)/crc32.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)

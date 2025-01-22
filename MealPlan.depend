@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1721774415 source:/mnt/omv1share1/Workspace/MealPlan/MealPlan.cpp
+1737561148 source:/mnt/omv1share1/Workspace/MealPlan/MealPlan.cpp
 	<iostream>
 	<stdio.h>
 	<stdlib.h>
@@ -13,4 +13,8 @@
 	<string>
 	<map>
 	<set>
+
+1737561935 source:/mnt/omv1share1/Workspace/MealPlan/crc32.cpp
+	<stdio.h>
+	<stdint.h>
 

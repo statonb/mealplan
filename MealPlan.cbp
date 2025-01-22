@@ -34,6 +34,8 @@
 			<Add option="-std=c++2b" />
 		</Compiler>
 		<Unit filename="MealPlan.cpp" />
+		<Unit filename="crc32.cpp" />
+		<Unit filename="crc32.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
