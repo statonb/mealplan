@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <getopt.h>
 #include <unistd.h>
 #include <ctype.h>
 #include <time.h>
@@ -48,7 +49,7 @@ void randInit(bool verboseFlag = false)
     srand(randSeed);
 }
 
-int main1(void)
+int main1(int argc, char *argv[])
 {
     int selection;
     FILE *fpMenu;
@@ -68,6 +69,29 @@ int main1(void)
     size_t itemsRemaining;
     struct termios oldSettings;
     struct termios newSettings;
+    int opt;
+    int verboseCount = 0;
+
+    while (1)
+    {
+        opt = getopt(argc, argv, "v");
+
+        if (-1 == opt) break;
+
+        switch (opt)
+        {
+        case 'v':
+            ++verboseCount;
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (verboseCount > 0)
+    {
+        std::cout << "Verbose Count = " << verboseCount << '\n';
+    }
 
     fpMenu = fopen(menuFileName, "r");
     if ((FILE *)(NULL) == fpMenu)
@@ -161,6 +185,11 @@ int main1(void)
         {
             // The selection contains the string "null" so skip it
             acceptYNQ = 'n';
+
+            if (verboseCount > 0)
+            {
+                std::cout << "\nSkipping null menu item " << selection << ": " << theMenu[selection] << '\n';
+            }
         }
         else
         {
@@ -233,12 +262,12 @@ int main1(void)
     return 0;
 }
 
-int main2(void)
+int main2(int argc, char *argv[])
 {
     return 0;
 }
 
 int main(int argc, char *argv[])
 {
-    return (main1());
+    return (main1(argc, argv));
 }
