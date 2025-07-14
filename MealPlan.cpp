@@ -157,7 +157,7 @@ int main1(int argc, char *argv[])
     newSettings.c_lflag &= (~ICANON);
     tcsetattr(STDIN_FILENO, TCSANOW, &newSettings);
 
-    randInit();
+    randInit((verboseCount >= 2));
 
     while   (   (false == acceptFlag)
              && (false == abortFlag)
