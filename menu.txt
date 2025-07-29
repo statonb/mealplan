@@ -1,0 +1,61 @@
+﻿0: 15-bean soup & bread
+1: BBQ tempeh
+2: Black bean bowls : null
+3: Black bean burgers and potato salad
+4: Buffalo cauliflower
+5: Chickpea and red peppers
+6: Chickpea picatta
+7: Chili
+8: Eggplant lasagna
+9: Fajitas
+10: Falafel and tabbouleh : null
+11: Fresh tomato puttanesca sauce
+12: Garlic Teriyaki Tempeh and Broccoli
+13: General Tso’s Tofu
+14: Grilled portabellas
+15: Hoppin John & collards
+16: Lentil Shepherd’s pie
+17: Enchiladas
+18: Mushroom risotto
+19: Mushroom stroganoff
+20: Olney Ale House veggie stew
+21: Buckeye Beans
+22: Refried Beans Tortillas
+23: Pasta e Ceci
+24: Mushroom French Dip Sandwiches
+25: Pasta and pesto sauce
+26: Pasta and red sauce
+27: Pot pie : null
+28: Potato soup & bread
+29: Pumpkin Waffles
+30: Red beans and rice
+31: Smokey oat bean burgers
+32: Stir fry with tempeh
+33: Tempeh buffalo wings & fries
+34: Tempeh steaks with Chimichurri Sauce
+35: Tofu Quiche
+36: Chili con sin
+37: Vegan sausage and peppers : null
+38: Veggie pizza
+39: Heart of Palm Scampi : null
+40: Stuffed Shells : null
+41: Seafood Salad : null
+42: Waffles and Vegan Sausage
+43: Buffalo Chickpea Bowls
+44: Teriyaki Tofu Bowl
+45: Sushi Bowl
+46: Smokey Confit Beans with Olives
+47: Salmon & Pineapple Rice
+48: Spicy Vegetables with Penne
+49: Summer Heirloom Bean Casserole 
+50: Baked Ziti
+51: Crispy Peanut Tofu Stir Fry
+52: Macaroni & Cheese
+53: Tacos
+54: Tuscan Orzo Casarole
+55: Veracruz Beans
+56: Spanish Farm Beans (with chirizo)
+57: Jerk Tofu with Rice and Plantains
+58: Chicken (soy curls) Tacos
+59: BBQ Soy Curls
+60: Quinoa and Black Bean Casarole
