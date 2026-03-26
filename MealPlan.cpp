@@ -14,6 +14,8 @@
 #include <set>
 #include "crc32.h"
 
+const char *VersionString = "1.0.1 - 2026-03-26";
+
 const char *menuFileName = "/mnt/omv1share1/Workspace/MealPlan/menu.txt";
 const char *recentSelectionsFileName = "/mnt/omv1share1/Workspace/MealPlan/recentSelections.txt";
 const size_t DEFAULT_MAX_NUM_RECENT_SELECTIONS = 10;
@@ -49,23 +51,84 @@ void randInit(bool verboseFlag = false)
     srand(randSeed);
 }
 
+int loadRecentSelections(std::vector<int> &recentSelectionsVector)
+{
+    FILE *fpRecentSelections = fopen(recentSelectionsFileName, "r");
+    char *cp;
+    int selection;
+    int returnVal = 0;
+    char tempLine[256];
+
+    if ((FILE *)(NULL) != fpRecentSelections)
+    {
+        while(fgets(tempLine, sizeof(tempLine), fpRecentSelections))
+        {
+            // First thing on the line is a selection number.  The rest of the line can be anything
+            // as long as there is a colon or a space immediately after the selection number.
+            cp = strchr(tempLine, ':');
+            if ((char *)(NULL) != cp)
+            {
+                *cp = '\0';
+            }
+            else
+            {
+                cp = strchr(tempLine, ' ');
+                if ((char *)(NULL) != cp)
+                {
+                    *cp = '\0';
+                }
+            }
+            selection = (int)strtol(tempLine, NULL, 10);
+            recentSelectionsVector.push_back(selection);
+            ++returnVal;
+        }
+        fclose(fpRecentSelections);
+    }
+    return returnVal;
+}
+
+int addRecentSelection(int selection, std::vector<int> &recentSelectionsVector, std::vector<std::string> &theMenu)
+{
+    std::vector<int>::const_iterator itRecentSelectionsVector;
+    FILE *fpRecentSelections;
+    
+    fpRecentSelections = fopen(recentSelectionsFileName, "w");
+    if ((FILE *)(NULL) == fpRecentSelections)
+    {
+        fprintf(stderr, "Can't open recent selections file.\n");
+        return -2;
+    }
+    recentSelectionsVector.insert(recentSelectionsVector.begin(), selection);
+
+    // Write recent selections up to the max number of saved selections
+    itRecentSelectionsVector = recentSelectionsVector.begin();
+    size_t n = 0;
+    while   (   (itRecentSelectionsVector != recentSelectionsVector.end())
+             && (n < DEFAULT_MAX_NUM_RECENT_SELECTIONS)
+            )
+    {
+        fprintf(fpRecentSelections, "%d: %s\n", *itRecentSelectionsVector, theMenu[*itRecentSelectionsVector].c_str());
+        itRecentSelectionsVector++;
+        n++;
+    }
+    fclose(fpRecentSelections);
+    return 0;
+}
+
 int main1(int argc, char *argv[])
 {
     int selection;
     FILE *fpMenu;
-    FILE *fpRecentSelections;
     char *cp;
     char tempLine[256];
     std::vector<std::string> theMenu;
     std::vector<int> recentSelectionsVector;
     std::vector<int> rejectedItemsVector;
-    std::vector<int>::const_iterator itRecentSelectionsVector;
     bool exitFlag = false;
     bool acceptFlag = false;
     bool abortFlag = false;
     bool nullMenuItem;
-    char acceptYNQ;
-    size_t maxNumRecentSelections = DEFAULT_MAX_NUM_RECENT_SELECTIONS;
+    char acceptYNQA;
     size_t itemsRemaining;
     struct termios oldSettings;
     struct termios newSettings;
@@ -124,32 +187,8 @@ int main1(int argc, char *argv[])
     }
     fclose(fpMenu);
 
-    fpRecentSelections = fopen(recentSelectionsFileName, "r");
-    if ((FILE *)(NULL) != fpRecentSelections)
-    {
-        while(fgets(tempLine, sizeof(tempLine), fpRecentSelections))
-        {
-            // First thing on the line is a selection number.  The rest of the line can be anything
-            // as long as there is a colon or a space immediately after the selection number.
-            cp = strchr(tempLine, ':');
-            if ((char *)(NULL) != cp)
-            {
-                *cp = '\0';
-            }
-            else
-            {
-                cp = strchr(tempLine, ' ');
-                if ((char *)(NULL) != cp)
-                {
-                    *cp = '\0';
-                }
-            }
-            selection = (int)strtol(tempLine, NULL, 10);
-            recentSelectionsVector.push_back(selection);
-        }
-        fclose(fpRecentSelections);
-    }
-
+    loadRecentSelections(recentSelectionsVector);
+    
     itemsRemaining = theMenu.size() - recentSelectionsVector.size();
 
     tcgetattr(STDIN_FILENO, &oldSettings);
@@ -184,7 +223,7 @@ int main1(int argc, char *argv[])
         if (true == nullMenuItem)
         {
             // The selection contains the string "null" so skip it
-            acceptYNQ = 'n';
+            acceptYNQA = 'n';
 
             if (verboseCount > 0)
             {
@@ -193,25 +232,38 @@ int main1(int argc, char *argv[])
         }
         else
         {
-            printf("Accept? <Y/N/Q>: ");
-            acceptYNQ = (char)getchar();
+            printf("Accept? <Y/N/Q/A>: ");
+            acceptYNQA = (char)getchar();
             putchar('\n');
         }
 
-        if  (   ('Q' == acceptYNQ)
-             || ('q' == acceptYNQ)
+        if  (   ('Q' == acceptYNQA)
+             || ('q' == acceptYNQA)
             )
         {
             abortFlag = true;
         }
-        else if (   ('Y' == acceptYNQ)
-                 || ('y' == acceptYNQ)
+        else if (   ('Y' == acceptYNQA)
+                 || ('y' == acceptYNQA)
                 )
         {
             acceptFlag = true;
         }
         else
         {
+            // The input was either 'N' or 'A'.
+            // If it was 'A' than add it to the recently used list
+            // and re-load the list.
+            if  (   ('A' == acceptYNQA)
+                 || ('a' == acceptYNQA)
+                )
+            {
+                if (addRecentSelection(selection, recentSelectionsVector, theMenu) < 0)
+                {
+                    fprintf(stderr, "Error adding item to Recently Selected file\n");
+                    return 2;
+                }
+            }                
             --itemsRemaining;
             if (itemsRemaining > 0)
             {
@@ -237,27 +289,7 @@ int main1(int argc, char *argv[])
         return 0;
     }
 
-    fpRecentSelections = fopen(recentSelectionsFileName, "w");
-    if ((FILE *)(NULL) == fpRecentSelections)
-    {
-        fprintf(stderr, "Can't open recent selections file.\n");
-        return 2;
-    }
-    // Write current selection first
-    fprintf(fpRecentSelections, "%d: %s\n", selection, theMenu[selection].c_str());
-
-    // Write recent selections up to the max number of saved selections
-    itRecentSelectionsVector = recentSelectionsVector.begin();
-    size_t n = 1;
-    while   (   (itRecentSelectionsVector != recentSelectionsVector.end())
-             && (n < maxNumRecentSelections)
-            )
-    {
-        fprintf(fpRecentSelections, "%d: %s\n", *itRecentSelectionsVector, theMenu[*itRecentSelectionsVector].c_str());
-        itRecentSelectionsVector++;
-        n++;
-    }
-    fclose(fpRecentSelections);
+    addRecentSelection(selection, recentSelectionsVector, theMenu);
 
     return 0;
 }
