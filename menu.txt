@@ -34,7 +34,7 @@
 33: Tempeh buffalo wings & fries
 34: Tempeh steaks with Chimichurri Sauce
 35: Tofu Quiche
-36: Chili con sin
+36: Chili sin carne
 37: Vegan sausage and peppers : null
 38: Veggie pizza
 39: Heart of Palm Scampi : null
@@ -59,3 +59,5 @@
 58: Chicken (soy curls) Tacos
 59: BBQ Soy Curls
 60: Quinoa and Black Bean Casarole
+61: Jambalya
+62: Vegan Pot Roast
